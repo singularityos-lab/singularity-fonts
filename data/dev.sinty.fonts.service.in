@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=dev.sinty.fonts
+Exec=@bindir@/singularity-fonts --gapplication-service

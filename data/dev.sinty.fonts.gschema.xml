@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="dev.sinty.fonts" path="/dev/sinty/fonts/">
+    <key name="sample-text" type="s">
+      <default>''</default>
+      <summary>Preview text</summary>
+      <description>Text shown when previewing a font; empty shows a pangram.</description>
+    </key>
+  </schema>
+</schemalist>

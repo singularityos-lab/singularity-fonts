@@ -1,0 +1,7 @@
+[Plugin]
+Module=font-previews
+Name=Font Previews
+Description=Show font files in Files with a sample written in the font
+Authors=Singularity
+Copyright=Copyright © Singularity
+X-Singularity-App=dev.sinty.fonts

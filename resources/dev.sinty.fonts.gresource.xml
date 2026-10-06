@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/dev/sinty/fonts/icons/scalable/actions">
+    <file alias="fonts-sans-symbolic.svg" preprocess="xml-stripblanks">symbolic/fonts-sans-symbolic.svg</file>
+    <file alias="fonts-serif-symbolic.svg" preprocess="xml-stripblanks">symbolic/fonts-serif-symbolic.svg</file>
+    <file alias="fonts-mono-symbolic.svg" preprocess="xml-stripblanks">symbolic/fonts-mono-symbolic.svg</file>
+    <file alias="fonts-display-symbolic.svg" preprocess="xml-stripblanks">symbolic/fonts-display-symbolic.svg</file>
+  </gresource>
+</gresources>

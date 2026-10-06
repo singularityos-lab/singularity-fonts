@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Fonts
+Comment=Browse, preview and install fonts
+Exec=singularity-fonts %U
+Icon=dev.sinty.fonts
+Terminal=false
+Type=Application
+Categories=Graphics;Utility;
+MimeType=font/ttf;font/otf;font/collection;font/woff;font/woff2;application/x-font-ttf;application/x-font-otf;
+Keywords=font;typeface;type;install;preview;
+StartupWMClass=dev.sinty.fonts
+Actions=install;
+
+[Desktop Action install]
+Name=Install Font File…
+Exec=singularity-fonts --install
