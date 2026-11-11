@@ -29,6 +29,7 @@ namespace Singularity.Apps.Fonts {
 
         protected override void startup () {
             base.startup ();
+            FontsIntents.install_intents (this);
             settings = new GLib.Settings ("dev.sinty.fonts");
             IconTheme.get_for_display (Gdk.Display.get_default ()).add_resource_path ("/dev/sinty/fonts/icons");
             var provider = new CssProvider ();

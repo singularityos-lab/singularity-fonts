@@ -33,7 +33,7 @@ resources = gnome.compile_resources(
 )
 
 executable('singularity-fonts',
-  files('src/model.vala', 'src/sample.vala', 'src/search.vala', 'src/window.vala', 'src/app.vala') + [resources],
+  files('src/model.vala', 'src/sample.vala', 'src/search.vala', 'src/window.vala', 'src/agent_intents.vala', 'src/app.vala') + [resources],
   dependencies: [gtk_dep, gee_dep, pango_dep, pangocairo_dep, pangoft2_dep, fontconfig_dep, math_dep, libsingularity_dep],
   install: true
 )
