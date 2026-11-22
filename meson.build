@@ -84,3 +84,36 @@ install_data('data/dev.sinty.fonts.gschema.xml',
 install_data('data/icons/dev.sinty.fonts.svg',
   install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps'
 )
+
+iride = find_program('iride', required: get_option('iride'))
+if iride.found()
+  custom_target('iride-icon',
+    input: 'data/icons/iride/iride.json',
+    output: 'dev.sinty.fonts.iride',
+    depend_files: files(
+      'data/icons/iride/layers/000.svg',
+      'data/icons/iride/layers/001.svg',
+      'data/icons/iride/layers/002.svg',
+      'data/icons/iride/layers/003.svg',
+      'data/icons/iride/layers/004.svg',
+      'data/icons/iride/layers/005.svg',
+      'data/icons/iride/layers/006.svg',
+      'data/icons/iride/layers/007.svg',
+      'data/icons/iride/layers/008.svg',
+      'data/icons/iride/layers/009.svg',
+      'data/icons/iride/layers/grande-0.svg',
+      'data/icons/iride/layers/grande-1.svg',
+      'data/icons/iride/layers/grande-2.svg',
+      'data/icons/iride/layers/grande-dietro-0.svg',
+      'data/icons/iride/layers/grande-dietro-1.svg',
+      'data/icons/iride/layers/grande-dietro-2.svg',
+      'data/icons/iride/layers/piccola-0.svg',
+      'data/icons/iride/layers/piccola-1.svg',
+      'data/icons/iride/layers/piccola-dietro-0.svg',
+      'data/icons/iride/layers/piccola-dietro-1.svg',
+    ),
+    command: [iride, 'build', meson.current_source_dir() / 'data' / 'icons' / 'iride', '@OUTPUT@'],
+    install: true,
+    install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps'
+  )
+endif
