@@ -2,7 +2,7 @@ using Gtk;
 
 namespace Singularity.Apps.Fonts {
 
-    public class FontsApp : Singularity.Application, Singularity.Migration.Migratable {
+    public class FontsApp : Singularity.Application, Singularity.Migration.Migratable, Singularity.Startup.Bootable {
         public GLib.Settings settings { get; private set; }
         private bool install_pending;
 
@@ -126,12 +126,43 @@ namespace Singularity.Apps.Fonts {
             return window;
         }
 
-        public override void activate () {
+        public Singularity.Startup.Plan build_plan (Singularity.Startup.Request request) {
+            var plan = new Singularity.Startup.Plan ();
+            plan.version = "fonts-1";
+            if (request.kind == Singularity.Startup.RequestKind.SERVICE) {
+                plan.main ("ready", Singularity.Startup.Category.PREPARE, (c) => {})
+                    .reaches (Singularity.Startup.Milestone.SHELL_READY)
+                    .reaches (Singularity.Startup.Milestone.CONTENT_READY)
+                    .reaches (Singularity.Startup.Milestone.INTERACTIVE);
+                return plan;
+            }
+            var shell = plan.main ("window", Singularity.Startup.Category.SHELL, (c) => {
+                c.window = request.kind == Singularity.Startup.RequestKind.OPEN ? ensure_window () : show_window ();
+            }).reaches (Singularity.Startup.Milestone.SHELL_READY);
+            if (request.kind == Singularity.Startup.RequestKind.OPEN) {
+                var files = request.files ();
+                plan.main ("open-file", Singularity.Startup.Category.CONTENT, (c) => open_files ((FontsWindow) c.window, files))
+                    .depends_on ("window")
+                    .reaches (Singularity.Startup.Milestone.CONTENT_READY)
+                    .reaches (Singularity.Startup.Milestone.INTERACTIVE);
+            } else {
+                shell.reaches (Singularity.Startup.Milestone.CONTENT_READY).reaches (Singularity.Startup.Milestone.INTERACTIVE);
+            }
+            return plan;
+        }
+
+        public void handle_request (Singularity.Startup.Request request) {
+            if (request.kind == Singularity.Startup.RequestKind.OPEN) open_files (ensure_window (), request.files ());
+            else show_window ();
+        }
+
+        private FontsWindow show_window () {
             var window = ensure_window ();
             if (install_pending) {
                 install_pending = false;
                 ((GLib.ActionGroup) window).activate_action ("open", null);
             }
+            return window;
         }
 
         public Variant save_model () {
@@ -204,8 +235,7 @@ namespace Singularity.Apps.Fonts {
             release ();
         }
 
-        public override void open (File[] files, string hint) {
-            var window = ensure_window ();
+        private void open_files (FontsWindow window, File[] files) {
             if (files.length > 0) window.preview_file (files[0]);
         }
 
