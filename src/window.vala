@@ -46,6 +46,9 @@ namespace Singularity.Apps.Fonts {
         private Family? shown = null;
         private File? pending_file = null;
         private string? pending_name = null;
+        private bool ready = false;
+
+        private signal void catalog_loaded ();
 
         public FontsWindow (FontsApp app) {
             Object (application: app);
@@ -59,6 +62,7 @@ namespace Singularity.Apps.Fonts {
             build_sidebar ();
 
             search = add_bubble_search (_("Search Fonts"), (text) => {
+                if (text == query) return;
                 query = text;
                 refresh ();
             });
@@ -279,7 +283,43 @@ namespace Singularity.Apps.Fonts {
 
         public async void reload () {
             catalog = yield Catalog.load ();
+            ready = true;
             refresh ();
+            catalog_loaded ();
+        }
+
+        public Variant save_migration () {
+            var d = new VariantDict ();
+            d.insert_value ("collection", new Variant.string (current));
+            d.insert_value ("query", new Variant.string (query));
+            if (pending_file != null) d.insert_value ("preview", new Variant.string (Singularity.Migration.portable_path (pending_file)));
+            else if (shown != null && panel_revealer.reveal_child) d.insert_value ("family", new Variant.string (shown.name));
+            return d.end ();
+        }
+
+        public string[] migration_files () {
+            if (pending_file == null) return {};
+            return { Singularity.Migration.portable_path (pending_file) };
+        }
+
+        public async void restore_migration (Variant data) {
+            var d = new VariantDict (data);
+            var collection = d.lookup_value ("collection", VariantType.STRING);
+            if (collection != null && rows.has_key (collection.get_string ())) current = collection.get_string ();
+            var text = d.lookup_value ("query", VariantType.STRING);
+            query = text != null ? text.get_string () : "";
+            search.entry.text = query;
+            var family = d.lookup_value ("family", VariantType.STRING);
+            if (family != null) pending_name = family.get_string ();
+            if (ready) {
+                refresh ();
+            } else {
+                ulong id = catalog_loaded.connect (() => restore_migration.callback ());
+                yield;
+                disconnect (id);
+            }
+            var preview = d.lookup_value ("preview", VariantType.STRING);
+            if (preview != null) yield preview_file_async (Singularity.Migration.local_file (preview.get_string ()));
         }
 
         public void show_named (string name) {

@@ -2,7 +2,7 @@ using Gtk;
 
 namespace Singularity.Apps.Fonts {
 
-    public class FontsApp : Singularity.Application {
+    public class FontsApp : Singularity.Application, Singularity.Migration.Migratable {
         public GLib.Settings settings { get; private set; }
         private bool install_pending;
 
@@ -132,6 +132,38 @@ namespace Singularity.Apps.Fonts {
                 install_pending = false;
                 ((GLib.ActionGroup) window).activate_action ("open", null);
             }
+        }
+
+        public Variant save_model () {
+            return new VariantDict ().end ();
+        }
+
+        public async void restore_model (Variant model) throws Error {
+        }
+
+        public string window_kind (Gtk.Window w) {
+            return (w is FontsWindow) ? "fonts" : "";
+        }
+
+        public Variant save_window (Gtk.Window w) {
+            return ((FontsWindow) w).save_migration ();
+        }
+
+        public string[] files () {
+            string[] found = {};
+            foreach (var w in get_windows ()) {
+                if (w is FontsWindow) {
+                    foreach (string f in ((FontsWindow) w).migration_files ()) found += f;
+                }
+            }
+            return found;
+        }
+
+        public async Gtk.Window? rebuild_window (string kind, Variant data) throws Error {
+            if (kind != "fonts") return null;
+            var window = new FontsWindow (this);
+            yield window.restore_migration (data);
+            return window;
         }
 
         public void show_family (string name) {
